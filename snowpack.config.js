@@ -3,23 +3,5 @@ module.exports = {
     public: '/',
     src: '/_dist_',
   },
-  plugins: ['@snowpack/plugin-typescript'],
-  install: [
-    /* ... */
-  ],
-  installOptions: {
-    installTypes: true,
-  },
-  devOptions: {
-    /* ... */
-  },
-  buildOptions: {
-    /* ... */
-  },
-  proxy: {
-    /* ... */
-  },
-  alias: {
-    /* ... */
-  },
-};
+  plugins: ['@snowpack/plugin-typescript', '@snowpack/plugin-dotenv'],
+}

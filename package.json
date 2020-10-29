@@ -1,21 +1,21 @@
 {
+  "name": "movie-ranking-app",
+  "description": "Movie ranking app",
   "scripts": {
     "start": "snowpack dev",
-    "build": "snowpack build",
-    "test": "echo \"This template does not include a test runner by default.\" && exit 1",
-    "format": "prettier --write \"src/**/*.{ts,js}\"",
-    "lint": "prettier --check \"src/**/*.{ts,js}\""
-  },
-  "dependencies": {
-    "canvas-confetti": "^1.2.0"
+    "build": "snowpack build"
   },
   "devDependencies": {
+    "@snowpack/plugin-dotenv": "^2.0.4",
     "@snowpack/plugin-run-script": "^2.1.7",
     "@snowpack/plugin-typescript": "^1.0.2",
-    "@types/canvas-confetti": "^1.0.0",
+    "@types/d3": "^5.16.3",
     "@types/snowpack-env": "^2.3.0",
     "prettier": "^2.0.5",
     "snowpack": "^2.15.1",
     "typescript": "^4.0.0"
+  },
+  "dependencies": {
+    "d3": "^6.2.0"
   }
 }
