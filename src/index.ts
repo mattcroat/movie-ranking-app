@@ -25,15 +25,15 @@ const createLoadingAnimation = () => {
   return loadingAnimation
 }
 
-const getAPIUrl = (year: number, genre: string, index: number) => {
-  return `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}${
-    genre ? `&with_genres=${genre}` : ''
-  }&region=US&with_release_type=3|2&primary_release_date.gte=${year}-${(
-    '0' +
-    (index + 1)
-  ).slice(-2)}-01&primary_release_date.lte=${year}-${('0' + (index + 1)).slice(
-    -2
-  )}-31`
+const getAPIUrl = (year: number, genre: number, month: number) => {
+  const apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}`
+  const genres = `${genre ? `&with_genres=${genre}` : ''}`
+  const region = `&region=US`
+  const releaseType = '&with_release_type=3|2'
+  const releaseDateGte = `&primary_release_date.gte=${year}-${('0' + (month + 1)).slice(-2)}-01`
+  const releseDateLte = `&primary_release_date.lte=${year}-${('0' + (month + 1)).slice(-2)}-31`
+
+  return `${apiUrl}${genres}${region}${releaseType}${releaseDateGte}${releseDateLte}`
 }
 
 // config
@@ -62,7 +62,7 @@ const yearSelect = yearDiv
   .append('select')
   .attr('id', 'yearSelect')
   .on('change', () => {
-    const currentGenre = (document.getElementById('genreSelect') as HTMLInputElement).value
+    const currentGenre = +(document.getElementById('genreSelect') as HTMLInputElement).value
     const currentYear = +(document.getElementById('yearSelect') as HTMLInputElement).value
     getMovieDataForYear(currentYear, currentGenre)
   })
@@ -81,7 +81,7 @@ const genreSelect = genreDiv
   .append('select')
   .attr('id', 'genreSelect')
   .on('change', () => {
-    const currentGenre = (document.getElementById('genreSelect') as HTMLInputElement).value
+    const currentGenre = +(document.getElementById('genreSelect') as HTMLInputElement).value
     const currentYear = +(document.getElementById('yearSelect') as HTMLInputElement).value
     getMovieDataForYear(currentYear, currentGenre)
   })
@@ -95,7 +95,7 @@ genreSelect
   .attr('value', genre => genre.id)
 
 // logic
-const getMovieDataForYear = async (year: number, genre: string) => {
+const getMovieDataForYear = async (year: number, genre: number) => {
   // clear
   monthsDiv.html('')
   movieDataDiv.html('')
@@ -116,11 +116,16 @@ const getMovieDataForYear = async (year: number, genre: string) => {
 
     try {
       movieDataElement.append(() => createLoadingAnimation().node())
-      // getAPIUrl(year, genre, index)
+      const url = getAPIUrl(year, genre, index)
+      const movieData = await d3.json(url)
     } catch (error) {
       console.error(error)
+      movieDataElement.selectAll('.lds-ring').remove()
+      movieDataDiv
+        .append('h2')
+        .text(`Error retrieveing data for ${month}-${year}`)
     }
   })
 }
 
-getMovieDataForYear(2020, 'Horror')
+getMovieDataForYear(2020, genres[11].id!)
