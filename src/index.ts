@@ -117,7 +117,70 @@ const getMovieDataForYear = async (year: number, genre: number) => {
     try {
       movieDataElement.append(() => createLoadingAnimation().node())
       const url = getAPIUrl(year, genre, index)
-      const movieData = await d3.json(url)
+      const movieData: any = (await d3.json(url)) ?? {}
+
+      movieDataElement.selectAll('.lds-ring').remove()
+
+      const monthDiv = movieDataDiv
+        .append('div')
+        .attr('id', `${month}-${year}`)
+        .attr('class', 'month-container')
+
+      const monthDivHeader = monthDiv
+        .append('div')
+        .attr('class', 'month-header')
+
+      monthDivHeader
+        .append('div')
+        .attr('class', 'header-container')
+        .append('h4')
+        .text(`${month} ${year}`)
+
+      monthDivHeader.append('a').attr('href', '#top').text('top')
+
+      // create data table
+      const table = monthDiv
+        .append('table')
+        .attr('class', 'table')
+        .attr('class', 'movie-table')
+
+      const filteredMovieData = movieData.results.map((movie: object) => {
+        return desiredHeaders.reduce((movies, field) => {
+          // @ts-ignore
+          movies[field] = movie[field]
+          return movies
+        }, {})
+      })
+
+      // add table headers
+      table
+        .append('thead')
+        .append('tr')
+        .selectAll('th')
+        .data(desiredHeaders)
+        .enter()
+        .append('th')
+        .text(heading =>
+          heading === 'genre_ids' ? 'genres' : heading.replace('_', ' ')
+        )
+
+      // add table data
+      table
+        .append('tbody')
+        .selectAll('tr')
+        .data(filteredMovieData)
+        .enter()
+        .append('tr')
+        .selectAll('td')
+        .data((data: any) => Object.keys(data).map(key => data[key]))
+        .enter()
+        .append('td')
+        .attr('class', 'movie-table-body')
+        .text((field, index) => {
+          return index === desiredHeaders.length - 1
+            ? field.map((genreId: any) => genres.find(genre => genre.id === genreId)?.name).join(', ')
+            : field
+        })
     } catch (error) {
       console.error(error)
       movieDataElement.selectAll('.lds-ring').remove()
